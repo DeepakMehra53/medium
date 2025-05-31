@@ -8,6 +8,7 @@ import { sign } from 'hono/jwt';
 const app = new Hono<{
   Bindings:{
     DATABASE_URL:string
+    JWT_SECRET:string
   }
 }>();
 
@@ -25,7 +26,7 @@ app.post('/api/v1/user/signup',async(c)=>{
         password:body.password,
        },
     })
-    const token = await sign({id:user.id},"secret")
+    const token = await sign({id:user.id},c.env.JWT_SECRET)
     return c.json({jwt:token})
   } catch (error) {
     return c.json({ error: "Failed to create user" }, 500);
