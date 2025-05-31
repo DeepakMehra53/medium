@@ -1,6 +1,7 @@
 import { Hono } from 'hono'
 import { PrismaClient } from '@prisma/client'
 import { withAccelerate } from '@prisma/extension-accelerate'
+import { sign } from 'hono/jwt';
 
 
 
@@ -17,13 +18,15 @@ app.post('/api/v1/user/signup',async(c)=>{
 
   try {
     const  body = await c.req.json();
+
    const user=await prisma.user.create({
       data:{
         email:body.email,
         password:body.password,
        },
     })
-    return c.json({message:"User created",user})
+    const token = await sign({id:user.id},"secret")
+    return c.json({jwt:token})
   } catch (error) {
     return c.json({ error: "Failed to create user" }, 500);
   }finally{
