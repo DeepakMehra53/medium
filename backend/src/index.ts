@@ -2,12 +2,40 @@ import { Hono } from 'hono'
 import { PrismaClient } from '@prisma/client'
 import { withAccelerate } from '@prisma/extension-accelerate'
 
-const prisma = new PrismaClient()
 
-const app = new Hono()
 
-app.get('/', (c) => {
-  return c.text('Hello Hono!')
+const app = new Hono<{
+  Bindings:{
+    DATABASE_URL:string
+  }
+}>();
+
+app.post('/api/v1/user/signup',(c)=>{
+  const prisma= new PrismaClient({
+    datasourceUrl:c.env.DATABASE_URL,
+  }).$extends(withAccelerate())
+  return c.text("Hello world")
+})
+
+
+app.post('/api/v1/user/signin',(c)=>{
+  return c.text("Hello signin page")
+})
+
+app.post('/api/v1/blog',(c)=>{
+  return c.text("Hello signin page")
+})
+
+app.put('/api/v1/blog',(c)=>{
+  return c.text("Hello signin page")
+})
+
+app.get('/api/v1/blog/:id',(c)=>{
+  return c.text("Hello signin page")
+})
+
+app.get('/api/v1/blog/bulk',(c)=>{
+  return c.text("Hello signin page")
 })
 
 export default app
