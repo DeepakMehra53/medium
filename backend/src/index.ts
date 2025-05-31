@@ -21,13 +21,16 @@ app.post('/api/v1/user/signup',async(c)=>{
       data:{
         email:body.email,
         password:body.password,
-        name:body.name
-      },
+       },
     })
+    return c.json({message:"User created",user})
   } catch (error) {
-    
+    return c.json({ error: "Failed to create user" }, 500);
+  }finally{
+    await prisma.$disconnect();
   }
-  return c.text("Hello world")
+
+ 
 })
 
 
