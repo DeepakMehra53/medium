@@ -1,0 +1,18 @@
+{
+  "name": "backend",
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy --minify",
+    "cf-typegen": "wrangler types --env-interface CloudflareBindings"
+  },
+  "dependencies": {
+    "bcrypt": "^6.0.0",
+    "cors": "^2.8.5",
+    "hono": "^4.7.10",
+    "prisma": "^6.8.2",
+    "zod": "^3.25.42"
+  },
+  "devDependencies": {
+    "wrangler": "^4.4.0"
+  }
+}
