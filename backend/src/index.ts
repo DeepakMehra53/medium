@@ -1,8 +1,5 @@
 import { Hono } from 'hono'
-import { PrismaClient } from '@prisma/client/edge'
-import { withAccelerate } from '@prisma/extension-accelerate'
-import { sign, verify } from 'hono/jwt';
-import bcrypt from 'bcryptjs'
+import { userRouter ,blogRouter} from './route/user';
 
 
 
@@ -13,6 +10,9 @@ const app = new Hono<{
 
   }
 }>();
+
+app.route('/api/v1/user',userRouter);
+app.route('/api/v1/blog',blogRouter);
 
 app.use('/api/v1/blog/*', async (c, next) => {
   const header = c.req.header("authentication") || "";
@@ -39,67 +39,7 @@ app.use('/api/v1/blog/*', async (c, next) => {
 
 })
 
-app.post('/api/v1/user/signup', async (c) => {
-  const prisma = new PrismaClient({
-    datasourceUrl: c.env.DATABASE_URL,
-  }).$extends(withAccelerate())
-
-  try {
-    const body = await c.req.json();
-    const { email, password, name } = body
-    const hashed = await bcrypt.hash(password, 10)
-    const user = await prisma.user.create({
-      data: {
-        email,
-        password: hashed,
-        name
-      },
-    })
-    const token = await sign({ id: user.id }, c.env.JWT_SECRET)
-    return c.json({ jwt: token })
-  } catch (error) {
-    console.error('Signup error:', error);
-    return c.json({ error: "Failed to create user" }, 500);
-  }
 
 
-})
-
-
-app.post('/api/v1/user/signin', async (c) => {
-  const prisma = new PrismaClient({
-    datasourceUrl: c.env.DATABASE_URL,
-  }).$extends(withAccelerate())
-
-  const body = await c.req.json()
-  const user = await prisma.user.findUnique({
-    where: {
-      email: body.email,
-     
-    }
-  })
-  if (!user || !(await bcrypt.compare(body.password, user.password))) {
-    c.status(403)
-    return c.json({ error: "Invalid credentials" })
-  }
-  const jwt = await sign({ id: user.id }, c.env.JWT_SECRET)
-  return c.json({ jwt })
-})
-
-app.post('/api/v1/blog', (c) => {
-  return c.text("Hello signin page")
-})
-
-app.put('/api/v1/blog', (c) => {
-  return c.text("Hello signin page")
-})
-
-app.get('/api/v1/blog/:id', (c) => {
-  return c.text("Hello signin page")
-})
-
-app.get('/api/v1/blog/bulk', (c) => {
-  return c.text("Hello signin page")
-})
 
 export default app
