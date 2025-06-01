@@ -1,23 +1,31 @@
-import { app } from "../src/app"
-import { testClient } from "hono/testing"
+// user.test.ts
+import { testClient } from 'hono/testing'
+import { describe, it, expect } from 'vitest'
+import { userRouter } from '../src/route/user'
+import { Hono } from 'hono'
 
-import { Hono } from "hono"
 
 describe('User Routes', () => {
-    const honoHandler = handle(app);
+    const client = testClient(userRouter, {
+        env: {
+            DATABASE_URL: 'your_test_db_url',
+            JWT_SECRET: 'your_test_secret'
+        }
+    })
 
     it('should signup a new user', async () => {
-        const res = await request(honoHandler)
-            .post('/api/v1/user/signup')
-            .send({
+        const res = await client['/signup'].$post({
+            json: {
                 email: `test${Date.now()}@mail.com`,
                 password: 'password123',
                 name: 'Test User'
-            });
+            }
+        })
 
-        expect(res.statusCode).toBe(200);
-        expect(res.body.jwt).toBeDefined();
-    });
+        expect(res.status).toBe(200)
+        const data = await res.json()
+        expect(data.jwt).toBeDefined()
+    })
 
-    // More tests...
-});
+    // Add a signin test if needed
+})
