@@ -1,6 +1,7 @@
 import { PrismaClient } from "@prisma/client/edge";
 import { withAccelerate } from "@prisma/extension-accelerate";
 import { Hono } from "hono";
+import { a } from '../../.wrangler/tmp/bundle-S1oNKg/middleware-loader.entry';
 
 export const blogRouter = new Hono<{
     Bindings:{
@@ -17,13 +18,20 @@ blogRouter.use("*/",(c,next)=>{
 
 
 blogRouter.post('/', async(c) => {
-    const {title,content,published,author} =await c.req.json()
+    const {title,content,published} =await c.req.json()
     const prisma = new PrismaClient({
         datasourceUrl:c.env.DATABASE_URL,
     }).$extends(withAccelerate())
 
     try {
-        
+        const blog = await prisma.post.create({
+            data:{
+                title,
+                content,
+                published,
+                authorId:1
+            }
+        })
     } catch (error) {
         
     }
