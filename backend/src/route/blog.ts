@@ -101,6 +101,21 @@ blogRouter.get('/:id', async(c) => {
     }
 })
 
-blogRouter.get('/bulk', (c) => {
-    return c.text("Hello signin page")
+blogRouter.get('/bulk', async(c) => {
+    const prisma = new  PrismaClient({
+        datasourceUrl:c.env.DATABASE_URL,
+    }).$extends(withAccelerate())
+    const page = parseInt(c.req.query('page')||'1')
+    const limit= parseInt(c.req.query('limit')||'10')
+    const skip =(page-1)*limit;
+    try {
+     const blog=await prisma.post.findMany({
+        skip,
+        take:limit,
+        
+     })
+     return c.json({page,limit,data:blog})
+    } catch (error) {
+        return c.json({ error: "Failed to create post" }, 500)
+    }
 })
