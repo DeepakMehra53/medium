@@ -17,16 +17,12 @@ export const blogRouter = new Hono<{
 blogRouter.use("*/",async(c,next)=>{
     const authHeader =  c.req.header("authorization") || "";
     const token = authHeader.startsWith("Bearer ") ? authHeader.slice(7) : "";
-    try {
-        const user = await verify(token, c.env.JWT_SECRET);
-        if (user && user.id) {
-            c.set("userId", user.id);
-            return next();
-        } else {
-            return c.json({ error: "Unauthorized" }, 401);
-        }
-    } catch (error) {
-        return c.json({ error: "Invalid token" }, 403);
+    const user = await verify(token,c.env.JWT_SECRET)
+    if(user){
+        c.set("userId",String(user.id))
+        return next()
+    }else{
+
     }
 })
 
