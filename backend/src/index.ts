@@ -2,7 +2,7 @@ import { Hono } from 'hono'
 import { PrismaClient } from '@prisma/client/edge'
 import { withAccelerate } from '@prisma/extension-accelerate'
 import { sign, verify } from 'hono/jwt';
-import bcrypt from 'bcrypt'
+import bcrypt from 'bcryptjs'
 
 
 
@@ -24,7 +24,7 @@ app.use('/api/v1/blog/*', async (c, next) => {
     return c.json({ error: "Token not provided" });
   }
   try {
-    const payload = await verify(token, c.env.DATABASE_URL)
+    const payload = await verify(token, c.env.JWT_SECRET)
     if (payload?.id) {
       await next()
     } else {
@@ -75,12 +75,12 @@ app.post('/api/v1/user/signin', async (c) => {
   const user = await prisma.user.findUnique({
     where: {
       email: body.email,
-      password: body.password
+     
     }
   })
-  if (!user) {
-    c.status(404)
-    return c.json({ error: "user not found" })
+  if (!user || !(await bcrypt.compare(body.password, user.password))) {
+    c.status(403)
+    return c.json({ error: "Invalid credentials" })
   }
   const jwt = await sign({ id: user.id }, c.env.JWT_SECRET)
   return c.json({ jwt })
