@@ -4,5 +4,14 @@
   },
   "dependencies": {
     "zod": "^3.25.48"
-  }
+  },
+  "name": "@deepakmehra53/medium-common",
+  "version": "1.0.0",
+  "main": "dist/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "description": ""
 }
