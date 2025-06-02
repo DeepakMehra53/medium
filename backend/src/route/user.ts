@@ -3,12 +3,13 @@ import { PrismaClient } from '@prisma/client/edge'
 import { withAccelerate } from '@prisma/extension-accelerate'
 import { sign } from 'hono/jwt';
 import bcrypt from 'bcryptjs'
+import { signupInput } from "../zod";
 
 export const userRouter = new Hono<{
-    Bindings:{
-        DATABASE_URL:string,
-        JWT_SECRET:string
-    }
+  Bindings: {
+    DATABASE_URL: string,
+    JWT_SECRET: string
+  }
 }>()
 
 userRouter.post('/signup', async (c) => {
@@ -47,7 +48,7 @@ userRouter.post('/signin', async (c) => {
   const user = await prisma.user.findFirst({
     where: {
       email: body.email,
-     password:body.password
+      password: body.password
     }
   })
   if (!user || !(await bcrypt.compare(body.password, user.password))) {
