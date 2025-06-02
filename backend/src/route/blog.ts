@@ -15,19 +15,19 @@ export const blogRouter = new Hono<{
 }>();
 
 blogRouter.use('/*', async (c, next) => {
-   const authHeader= c.req.header("authorization") || ""
+    const authHeader = c.req.header("authorization") || ""
     const token = authHeader.startsWith("Bearer ") ? authHeader.slice(7) : "";
     const user = await verify(token, c.env.JWT_SECRET);
-   if(user){
-    c.set('userId',String(user.id))
-    await next()
-   } else{
-    c.status(403)
-    return c.json({
-        msg:"You are not logged in"
-    })
-   }
-}) 
+    if (user) {
+        c.set('userId', String(user.id))
+        await next()
+    } else {
+        c.status(403)
+        return c.json({
+            msg: "You are not logged in"
+        })
+    }
+})
 
 
 
@@ -70,10 +70,10 @@ blogRouter.put('/', async (c) => {
     try {
         const blog = await prisma.post.update({
             where: {
-                id:body. id
+                id: body.id
             }, data: {
-                title:body.title,
-                content:body.content
+                title: body.title,
+                content: body.content
 
             }
         })
@@ -86,15 +86,34 @@ blogRouter.put('/', async (c) => {
     }
 })
 
-blogRouter.get('/:id', async(c) => {
+blogRouter.get('/bulk', async (c) => {
+    const prisma = new PrismaClient({
+        datasourceUrl: c.env.DATABASE_URL,
+    }).$extends(withAccelerate())
+    const page = parseInt(c.req.query('page') || '1')
+    const limit = parseInt(c.req.query('limit') || '10')
+    const skip = (page - 1) * limit;
+    try {
+        const blog = await prisma.post.findMany({
+            skip,
+            take: limit,
+
+        })
+        return c.json({ page, limit, data: blog })
+    } catch (error) {
+        return c.json({ error: "Failed to create post" }, 500)
+    }
+})
+
+blogRouter.get('/:id', async (c) => {
     const id = c.req.param("id")
     const prisma = new PrismaClient({
-        datasourceUrl:c.env.DATABASE_URL,
+        datasourceUrl: c.env.DATABASE_URL,
     }).$extends(withAccelerate())
     try {
-        const blogs =  await prisma.post.findFirst({
-            where:{
-                id:Number (id)
+        const blogs = await prisma.post.findFirst({
+            where: {
+                id: Number(id)
             }
         })
         return c.json({
@@ -105,20 +124,20 @@ blogRouter.get('/:id', async(c) => {
     }
 })
 
-blogRouter.get('/bulk', async(c) => {
-    const prisma = new  PrismaClient({
-        datasourceUrl:c.env.DATABASE_URL,
+blogRouter.get('/bulk', async (c) => {
+    const prisma = new PrismaClient({
+        datasourceUrl: c.env.DATABASE_URL,
     }).$extends(withAccelerate())
-    const page = parseInt(c.req.query('page')||'1')
-    const limit= parseInt(c.req.query('limit')||'10')
-    const skip =(page-1)*limit;
+    const page = parseInt(c.req.query('page') || '1')
+    const limit = parseInt(c.req.query('limit') || '10')
+    const skip = (page - 1) * limit;
     try {
-     const blog=await prisma.post.findMany({
-        skip,
-        take:limit,
-        
-     })
-     return c.json({page,limit,data:blog})
+        const blog = await prisma.post.findMany({
+            skip,
+            take: limit,
+
+        })
+        return c.json({ page, limit, data: blog })
     } catch (error) {
         return c.json({ error: "Failed to create post" }, 500)
     }
