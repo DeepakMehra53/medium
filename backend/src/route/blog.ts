@@ -14,26 +14,26 @@ export const blogRouter = new Hono<{
     }
 }>();
 
-blogRouter.use("*/", async (c, next) => {
-    const authHeader = c.req.header("authorization") || "";
+blogRouter.use('/*', async (c, next) => {
+   const authHeader= c.req.header("authorization") || ""
     const token = authHeader.startsWith("Bearer ") ? authHeader.slice(7) : "";
-    const user = await verify(token, c.env.JWT_SECRET)
-    if (user?.id) {
-        c.set("userId", String(user.id))
-        await next()
-    } else {
-        c.status(403)
-        return c.json({
-            msg: "You are not logged in "
-        })
-    }
-})
+    const user = await verify(token, c.env.JWT_SECRET);
+   if(user){
+    c.set('userId',String(user.id))
+    await next()
+   } else{
+    c.status(403)
+    return c.json({
+        msg:"You are not logged in"
+    })
+   }
+}) 
 
 
 
 
 blogRouter.post('/', async (c) => {
-    const { title, content, published } = await c.req.json()
+    const { title, content } = await c.req.json()
     const autherId = c.get("userId")
 
     if (!autherId || isNaN(Number(autherId))) {
@@ -47,7 +47,6 @@ blogRouter.post('/', async (c) => {
             data: {
                 title,
                 content,
-                published,
                 authorId: Number(autherId)
             }
         })
