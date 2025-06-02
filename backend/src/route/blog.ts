@@ -18,9 +18,9 @@ blogRouter.use("*/", async (c, next) => {
     const authHeader = c.req.header("authorization") || "";
     const token = authHeader.startsWith("Bearer ") ? authHeader.slice(7) : "";
     const user = await verify(token, c.env.JWT_SECRET)
-    if (user) {
+    if (user?.id) {
         c.set("userId", String(user.id))
-        return next()
+        await next()
     } else {
         c.status(403)
         return c.json({
@@ -35,6 +35,10 @@ blogRouter.use("*/", async (c, next) => {
 blogRouter.post('/', async (c) => {
     const { title, content, published } = await c.req.json()
     const autherId = c.get("userId")
+
+    if (!autherId || isNaN(Number(autherId))) {
+        return c.json({ error: "Invalid or missing user ID" }, 400);
+    }
     const prisma = new PrismaClient({
         datasourceUrl: c.env.DATABASE_URL,
     }).$extends(withAccelerate())
@@ -51,6 +55,7 @@ blogRouter.post('/', async (c) => {
             id: blog.id
         })
     } catch (error) {
+        console.error(error)
         return c.json({ error: "Failed to create post" }, 500);
     }
 
