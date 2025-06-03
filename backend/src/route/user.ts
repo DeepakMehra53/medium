@@ -12,21 +12,24 @@ export const userRouter = new Hono<{
   }
 }>()
 
+const getPrisma = (env: { DATABASE_URL: string }) => {
+  return new PrismaClient({ datasourceUrl: env.DATABASE_URL }).$extends(withAccelerate())
+
+}
+
 userRouter.post('/signup', async (c) => {
   const body = await c.req.json();
   const { success } = signupInput.safeParse(body)
   if (!success) {
     c.status(411)
     return c.json({
-      meassage: "Input are not correct"
+      message: "Input are not correct"
     })
   }
-  const prisma = new PrismaClient({
-    datasourceUrl: c.env.DATABASE_URL,
-  }).$extends(withAccelerate())
+  const prisma = getPrisma(c.env)
 
   try {
-    const { email, password, name } = body
+    const { username: email, password, name } = body
     const hashed = await bcrypt.hash(password, 10)
     const user = await prisma.user.create({
       data: {
@@ -46,6 +49,7 @@ userRouter.post('/signup', async (c) => {
 })
 
 
+
 userRouter.post('/signin', async (c) => {
   const body = await c.req.json()
   const {success}= signinInput.safeParse(body)
@@ -55,14 +59,12 @@ userRouter.post('/signin', async (c) => {
       meassage:"Input are not correct"
     })
   }
-  const prisma = new PrismaClient({
-    datasourceUrl: c.env.DATABASE_URL,
-  }).$extends(withAccelerate())
-
+  const prisma = getPrisma(c.env)
+  const{username:email} =body;
   const user = await prisma.user.findFirst({
     where: {
-      email: body.email,
-      password: body.password
+      email
+     
     }
   })
   if (!user || !(await bcrypt.compare(body.password, user.password))) {

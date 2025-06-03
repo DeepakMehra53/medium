@@ -14,6 +14,13 @@ export const blogRouter = new Hono<{
     }
 }>();
 
+
+const getPrisma= (env:{DATABASE_URL:string})=>{
+    return  new PrismaClient({datasourceUrl:env.DATABASE_URL}).$extends(withAccelerate())
+
+}
+
+
 blogRouter.use('/*', async (c, next) => {
     const authHeader = c.req.header("authorization") || ""
     const token = authHeader.startsWith("Bearer ") ? authHeader.slice(7) : "";
@@ -55,9 +62,7 @@ blogRouter.post('/', async (c) => {
     if (!autherId || isNaN(Number(autherId))) {
         return c.json({ error: "Invalid or missing user ID" }, 400);
     }
-    const prisma = new PrismaClient({
-        datasourceUrl: c.env.DATABASE_URL,
-    }).$extends(withAccelerate())
+    const prisma = getPrisma(c.env)
     try {
         const blog = await prisma.post.create({
             data: {
@@ -87,9 +92,7 @@ blogRouter.put('/', async (c) => {
             meassage: "Input are not correct"
         })
     }
-    const prisma = new PrismaClient({
-        datasourceUrl: c.env.DATABASE_URL,
-    }).$extends(withAccelerate())
+    const prisma = getPrisma(c.env)
     try {
         const blog = await prisma.post.update({
             where: {
@@ -110,9 +113,7 @@ blogRouter.put('/', async (c) => {
 })
 
 blogRouter.get('/bulk', async (c) => {
-    const prisma = new PrismaClient({
-        datasourceUrl: c.env.DATABASE_URL,
-    }).$extends(withAccelerate())
+    const prisma = getPrisma(c.env)
     const page = parseInt(c.req.query('page') || '1')
     const limit = parseInt(c.req.query('limit') || '10')
     const skip = (page - 1) * limit;
@@ -130,9 +131,7 @@ blogRouter.get('/bulk', async (c) => {
 
 blogRouter.get('/:id', async (c) => {
     const id = c.req.param("id")
-    const prisma = new PrismaClient({
-        datasourceUrl: c.env.DATABASE_URL,
-    }).$extends(withAccelerate())
+    const prisma = getPrisma(c.env)
     try {
         const blogs = await prisma.post.findFirst({
             where: {
@@ -147,21 +146,3 @@ blogRouter.get('/:id', async (c) => {
     }
 })
 
-blogRouter.get('/bulk', async (c) => {
-    const prisma = new PrismaClient({
-        datasourceUrl: c.env.DATABASE_URL,
-    }).$extends(withAccelerate())
-    const page = parseInt(c.req.query('page') || '1')
-    const limit = parseInt(c.req.query('limit') || '10')
-    const skip = (page - 1) * limit;
-    try {
-        const blog = await prisma.post.findMany({
-            skip,
-            take: limit,
-
-        })
-        return c.json({ page, limit, data: blog })
-    } catch (error) {
-        return c.json({ error: "Failed to create post" }, 500)
-    }
-})
