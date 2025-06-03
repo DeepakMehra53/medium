@@ -3,7 +3,7 @@ import { PrismaClient } from '@prisma/client/edge'
 import { withAccelerate } from '@prisma/extension-accelerate'
 import { sign } from 'hono/jwt';
 import bcrypt from 'bcryptjs'
-import { signinInput,signupInput } from "@deepakmehra53/medium-common";
+import { signinInput, signupInput } from "@deepakmehra53/medium-common";
 
 export const userRouter = new Hono<{
   Bindings: {
@@ -52,19 +52,19 @@ userRouter.post('/signup', async (c) => {
 
 userRouter.post('/signin', async (c) => {
   const body = await c.req.json()
-  const {success}= signinInput.safeParse(body)
-  if(!success){
+  const { success } = signinInput.safeParse(body)
+  if (!success) {
     c.status(411)
     return c.json({
-      meassage:"Input are not correct"
+      meassage: "Input are not correct"
     })
   }
   const prisma = getPrisma(c.env)
-  const{username:email} =body;
+  const { username: email } = body;
   const user = await prisma.user.findFirst({
     where: {
       email
-     
+
     }
   })
   if (!user || !(await bcrypt.compare(body.password, user.password))) {

@@ -15,8 +15,8 @@ export const blogRouter = new Hono<{
 }>();
 
 
-const getPrisma= (env:{DATABASE_URL:string})=>{
-    return  new PrismaClient({datasourceUrl:env.DATABASE_URL}).$extends(withAccelerate())
+const getPrisma = (env: { DATABASE_URL: string }) => {
+    return new PrismaClient({ datasourceUrl: env.DATABASE_URL }).$extends(withAccelerate())
 
 }
 
@@ -41,7 +41,7 @@ blogRouter.use('/*', async (c, next) => {
             msg: "You are not logged in"
         })
     }
-    
+
 })
 
 
@@ -49,9 +49,9 @@ blogRouter.use('/*', async (c, next) => {
 
 blogRouter.post('/', async (c) => {
     const body = await c.req.json()
-    const  { title, content } = body
-    const{success}= createBlogInput.safeParse(body)
-    if(!success){
+    const { title, content } = body
+    const { success } = createBlogInput.safeParse(body)
+    if (!success) {
         c.status(411)
         return c.json({
             meassage: "Input are not correct"
@@ -85,8 +85,8 @@ blogRouter.post('/', async (c) => {
 
 blogRouter.put('/', async (c) => {
     const body = await c.req.json()
-    const {success }= updateBlogInput.safeParse(body)
-    if(!success){
+    const { success } = updateBlogInput.safeParse(body)
+    if (!success) {
         c.status(411)
         return c.json({
             meassage: "Input are not correct"
