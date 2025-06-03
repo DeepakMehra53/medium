@@ -15,6 +15,7 @@ dist/
 # deps
 node_modules/
 .wrangler
+.wranger.jsonc
 .package-lock.json/
 
 # env
