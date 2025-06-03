@@ -21,14 +21,14 @@ export const Auth = ({ type }: { type: "signup" | "signin" }) => {
                 : "Already have an account?"}
               <Link
                 className="underline pl-2"
-                to={type === "signin" ? "signup" : "/signin"}
+                to={type === "signin" ? "/signup" : "/signin"}
               >
                 {type === "signin" ? "Sign up " : "Sign in"}
               </Link>
             </div>
           </div>
           <div className="pt-4">
-            <LabelledInput
+            {type === "signup" ?<LabelledInput
               label="Name"
               placeholder="Username"
               onChange={(e) => {
@@ -37,7 +37,7 @@ export const Auth = ({ type }: { type: "signup" | "signin" }) => {
                   name: e.target.value,
                 });
               }}
-            />
+            />:""}
             <LabelledInput
               label="Email"
               placeholder="email@gmail.com"
