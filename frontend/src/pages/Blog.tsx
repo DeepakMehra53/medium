@@ -1,4 +1,3 @@
-import React from 'react'
 import { useBlog } from '../hook'
 import { useParams } from 'react-router-dom'
 import { SingleBlog } from '../components/SingleBlog'
@@ -14,7 +13,7 @@ if(loading){
 }
   return (
     <div>
-      <SingleBlog blog={blog}/>
+      <SingleBlog blog={blog!}/>
     </div>
   )
 }
