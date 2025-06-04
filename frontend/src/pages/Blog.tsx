@@ -1,13 +1,16 @@
 import React from 'react'
-import { BlogCard } from '../components/BlogCard'
+import { useBlog } from '../hook'
 
 export const Blog = () => {
+const {loading,blog} = useBlog()
+if(loading){
+  return <div>
+    loading....
+  </div>
+}
   return (
     <div>
-      <BlogCard authorName={"deepak"}
-    title={"dawdad"}
-    content={"daca adidnw thwe  winw adadaw"}
-    publishedDate={"2nd fed 2024"}/>
+
     </div>
   )
 }

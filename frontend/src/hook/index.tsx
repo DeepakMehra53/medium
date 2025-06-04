@@ -11,7 +11,7 @@ interface Blog {
 }
 
 export const useBlog=({id}:{id:string})=>{
-    const [loading, setloadind] = useState(true);
+    const [loading, setloading] = useState(true);
     const [blog, setBlog] = useState<Blog>();
     useEffect(() => {
       const token = localStorage.getItem("token");
@@ -22,8 +22,8 @@ export const useBlog=({id}:{id:string})=>{
           },
         })
         .then((response) => {
-          setBlog(response.data.data);
-          setloadind(false);
+          setBlog(response.data.blogs);
+          setloading(false);
         });
     }, [id]);
     return { loading, blog};
@@ -32,7 +32,7 @@ export const useBlog=({id}:{id:string})=>{
 
 
 export const useBlogs = () => {
-  const [loading, setloadind] = useState(true);
+  const [loading, setloading] = useState(true);
   const [blogs, setBlogs] = useState<Blog[]>([]);
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -44,7 +44,7 @@ export const useBlogs = () => {
       })
       .then((response) => {
         setBlogs(response.data.data);
-        setloadind(false);
+        setloading(false);
       });
   }, []);
   return { loading, blogs };
