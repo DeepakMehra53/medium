@@ -2,10 +2,12 @@ import axios from "axios";
 import { AppBar } from "./Appbar";
 import { BACKEND_URL } from "../config";
 import { useState, type ChangeEvent } from "react";
+import { useNavigate } from "react-router-dom";
 
 export const Publish = () => {
+    const navigate = useNavigate()
   const [title, setTitle] = useState("");
-  const [description, setDescription] = useState("");
+  const [content, setContent] = useState("");
   return (
     <div>
       <AppBar />
@@ -17,14 +19,20 @@ export const Publish = () => {
             className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 "
             placeholder="Title"
           />
-          <TextEditor onChange={(e)=>setDescription(e.target.value)} />
+          <TextEditor onChange={(e)=>setContent(e.target.value)} />
           <button
             type="submit"
-            onClick={() => {
-              axios.post(`${BACKEND_URL}/api/v1/blog`, {
+            onClick={async() => {
+                const token = localStorage.getItem("token");
+           const response = await  axios.post(`${BACKEND_URL}/api/v1/blog`, {
                 title,
-                description,
+                content,
+              }, {
+                headers:{
+                    Authorization:`Bearer ${token}`
+                }
               });
+              navigate(`/blog/${response.data.id}`)
             }}
             className="mt-1 inline-flex items-center px-5 py-2.5 text-sm font-medium text-center text-white bg-blue-700 rounded-lg focus:ring-4 focus:ring-blue-200 dark:focus:ring-blue-900 hover:bg-blue-800"
           >
