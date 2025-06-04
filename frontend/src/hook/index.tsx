@@ -1,17 +1,29 @@
-import { useEffect, useState } from "react"
-import axios from "axios"
-import { BACKEND_URL } from "../config"
-
-export const useBlogs=()=>{
-    const [loading,setloadind] = useState(true)
-    const [blogs,setBlogs]=useState([])
-    useEffect(()=>{
-        axios.get(`${BACKEND_URL}/api/v1/bulk`)
-            .then(response=>{
-                setBlogs(response.data)
-                setloadind(false)
-            })
-
-    },[])
-    return {loading,blogs}
+import { useEffect, useState } from "react";
+import axios from "axios";
+import { BACKEND_URL } from "../config";
+interface Blog {
+  content: string;
+  title: string;
+  id: number;
+  author: {
+    name: string;
+  };
 }
+export const useBlogs = () => {
+  const [loading, setloadind] = useState(true);
+  const [blogs, setBlogs] = useState<Blog[]>([]);
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    axios
+      .get(`${BACKEND_URL}/api/v1/blog/bulk`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      })
+      .then((response) => {
+        setBlogs(response.data.data);
+        setloadind(false);
+      });
+  }, []);
+  return { loading, blogs };
+};

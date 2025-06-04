@@ -14,13 +14,25 @@ export const Auth = ({ type }: { type: "signup" | "signin" }) => {
  async function sendRequest() {
     try {
         const res =await axios.post(`${BACKEND_URL}/api/v1/user/${type === "signup" ? "signup" :"signin"}`,postInput);
-        const jwt = res.data;
+       console.log("Signup/Signin response:", res.data);
+
+       // Handle token based on backend response shape
+       const jwt = res.data.jwt;
+
+       if (!jwt) {
+         throw new Error("Token is undefined in response");
+       }
         localStorage.setItem("token",jwt)
         navigate('/blogs')
         
     } catch (error) {
-        alert("Request failed")
-        console.error(error)
+         if (axios.isAxiosError(error)) {
+           console.error("Axios error:", error.response?.data);
+           alert(`Error: ${error.response?.data?.message || "Request failed"}`);
+         } else {
+           console.error("Unknown error:", error);
+           alert("Unknown error occurred");
+         }
     }
   }
 
