@@ -9,6 +9,28 @@ interface Blog {
     name: string;
   };
 }
+
+export const useBlog=({id}:{id:string})=>{
+    const [loading, setloadind] = useState(true);
+    const [blog, setBlog] = useState<Blog>();
+    useEffect(() => {
+      const token = localStorage.getItem("token");
+      axios
+        .get(`${BACKEND_URL}/api/v1/blog/${id}`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        })
+        .then((response) => {
+          setBlog(response.data.data);
+          setloadind(false);
+        });
+    }, [id]);
+    return { loading, blog};
+}
+
+
+
 export const useBlogs = () => {
   const [loading, setloadind] = useState(true);
   const [blogs, setBlogs] = useState<Blog[]>([]);
