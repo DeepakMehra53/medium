@@ -2,7 +2,7 @@ import { useEffect, useState } from "react"
 import axios from "axios"
 import { BACKEND_URL } from "../config"
 
-export const useBlog=()=>{
+export const useBlogs=()=>{
     const [loading,setloadind] = useState(true)
     const [blogs,setBlogs]=useState([])
     useEffect(()=>{

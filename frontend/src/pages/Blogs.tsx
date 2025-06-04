@@ -1,7 +1,15 @@
-import { AppBar } from "../components/AppBar"
+import { AppBar } from "../components/Appbar"
 import { BlogCard } from "../components/BlogCard"
+import { useBlogs } from "../hook";
 
 export const Blogs =()=>{
+  const {loading,blogs} = useBlogs()
+  if(loading){
+    return <div>
+      loading...
+    </div>
+  }
+  
     return (
       <div>
           <AppBar />

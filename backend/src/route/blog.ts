@@ -121,6 +121,18 @@ blogRouter.get('/bulk', async (c) => {
         const blog = await prisma.post.findMany({
             skip,
             take: limit,
+            select:{
+                content:true,
+                title:true,
+                id:true,
+                author:{
+                    select:{
+                        name:true
+                    }
+                }
+
+
+            }
 
         })
         return c.json({ page, limit, data: blog })
