@@ -2,9 +2,11 @@ FROM node:20-slim
 
 WORKDIR /app
 
-COPY package.json package-lock.json ./
-COPY prisma  ./prisma
+COPY package* .
+COPY ./prisma .
+
 RUN  npm install 
+RUN npx prisma generate
 
 COPY . .
 
