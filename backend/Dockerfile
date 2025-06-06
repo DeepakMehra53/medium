@@ -1,16 +1,12 @@
 FROM node:20-slim
 
-
 WORKDIR /app
 
-COPY package*.json ./
-RUN  npm install && npm cache clean --force 
+COPY package.json package-lock.json ./
+COPY prisma  ./prisma
+RUN  npm install 
 
 COPY . .
-
-RUN npx prisma generate
-    
-
 
 EXPOSE 4000
 
