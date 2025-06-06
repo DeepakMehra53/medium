@@ -4,11 +4,13 @@ FROM node:20-slim
 WORKDIR /app
 
 COPY package*.json ./
-RUN npm install --omit=dev
+RUN  npm install && npm cache clean --force
 
 COPY . .
 
 RUN npx prisma generate
+    
+
 
 EXPOSE 4000
 
